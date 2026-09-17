@@ -1,0 +1,16 @@
+/.env
+/.env.*
+!/.env.example
+/backend/.env
+/backend/vendor/
+/code-engine/.venv/
+/code-engine/__pycache__/
+/dashboard-web/node_modules/
+/dashboard-web/build/
+/cli/node_modules/
+/mobile-android/.gradle/
+/mobile-android/*/build/
+/desktop-windows/node_modules/
+*.log
+.DS_Store
+Thumbs.db
