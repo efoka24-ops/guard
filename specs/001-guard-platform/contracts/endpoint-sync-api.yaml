@@ -1,0 +1,164 @@
+openapi: 3.0.3
+info:
+  title: GUARD Endpoint Sync API
+  version: "0.1.0"
+  description: >
+    Contrat du premier incrément — synchronisation entre l'agent terminal
+    GUARD ENDPOINT (Android/Windows, niveaux 1-2 uniquement) et le backend
+    Laravel central. Conçu pour fonctionner en connexion intermittente :
+    chaque endpoint accepte des envois différés et idempotents.
+servers:
+  - url: https://guard.trugroup.cm/api/v1
+security:
+  - bearerAuth: []
+paths:
+  /terminals/register:
+    post:
+      summary: Enregistrer ou mettre à jour un terminal
+      operationId: registerTerminal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [device_hash, platform, app_version]
+              properties:
+                device_hash: { type: string, description: "Identifiant appareil salé, jamais l'IMEI/GUID brut" }
+                platform: { type: string, enum: [android, windows] }
+                app_version: { type: string }
+                organisation_token: { type: string, description: "Token d'enrôlement fourni à l'organisation" }
+      responses:
+        "201":
+          description: Terminal créé ou mis à jour
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Terminal" }
+        "401": { description: "organisation_token invalide" }
+
+  /signatures/delta:
+    get:
+      summary: Récupérer le delta de signatures depuis une version locale
+      operationId: getSignatureDelta
+      parameters:
+        - name: from_version
+          in: query
+          required: false
+          schema: { type: string }
+          description: "Version locale actuelle du terminal ; absent = paquet complet initial"
+      responses:
+        "200":
+          description: >
+            Paquet delta (< 50 Ko en moyenne, cf. contrainte SC-010).
+            Contient hashes ajoutés, règles YARA ajoutées, checksum.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SignatureDelta" }
+        "204":
+          description: Déjà à jour
+
+  /scan-events:
+    post:
+      summary: Remonter un ou plusieurs événements de scan (batch, offline-tolerant)
+      operationId: submitScanEvents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [terminal_id, events]
+              properties:
+                terminal_id: { type: string, format: uuid }
+                events:
+                  type: array
+                  items: { $ref: "#/components/schemas/ScanEvent" }
+      responses:
+        "202":
+          description: >
+            Événements acceptés pour traitement asynchrone (queue driver
+            database, cf. research.md §2). Les alertes correspondantes sont
+            créées de façon asynchrone, pas dans cette réponse.
+        "409":
+          description: "Événements déjà reçus (idempotence par client_event_id)"
+
+  /alerts:
+    get:
+      summary: Lister les alertes de l'organisation (Command Center)
+      operationId: listAlerts
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string, enum: [nouvelle, accusee_reception, assignee, resolue, ignoree] }
+        - name: severity
+          in: query
+          schema: { type: string, enum: [info, faible, moyen, eleve, critique] }
+      responses:
+        "200":
+          description: Liste paginée des alertes
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Alert" }
+
+  /alerts/{id}/acknowledge:
+    post:
+      summary: Accuser réception d'une alerte (FR-024)
+      operationId: acknowledgeAlert
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200": { description: "Alerte marquée accusee_reception" }
+        "404": { description: "Alerte introuvable" }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Terminal:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        platform: { type: string, enum: [android, windows] }
+        signature_version: { type: string }
+        status: { type: string, enum: [actif, hors_ligne_prolonge, desinstalle] }
+
+    SignatureDelta:
+      type: object
+      properties:
+        version: { type: string }
+        size_kb: { type: number }
+        hashes_added: { type: array, items: { type: string } }
+        yara_rules_added: { type: array, items: { type: string } }
+        checksum: { type: string }
+
+    ScanEvent:
+      type: object
+      required: [client_event_id, trigger, sha256, level_reached, classification, occurred_at]
+      properties:
+        client_event_id: { type: string, description: "UUID généré localement, garantit l'idempotence" }
+        trigger: { type: string, enum: [usb, apk_install, fichier_local, sms_lien, email_piece_jointe] }
+        sha256: { type: string, minLength: 64, maxLength: 64 }
+        yara_rule_matched: { type: string, nullable: true }
+        level_reached: { type: string, enum: [1_hash, 2_yara] , description: "3_ia hors périmètre du 1er incrément" }
+        classification: { type: string, enum: [clean, suspect, probable_malware, malware_confirme] }
+        action_taken: { type: string, enum: [aucune, surveillance, quarantaine_proposee, quarantaine_auto] }
+        occurred_at: { type: string, format: date-time, description: "Horodatage local terminal, peut précéder la synchro de plusieurs jours" }
+
+    Alert:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        module_source: { type: string, enum: [ENDPOINT, SOCIAL, WEB, ID, CODE] }
+        severity: { type: string, enum: [info, faible, moyen, eleve, critique] }
+        title: { type: string }
+        status: { type: string, enum: [nouvelle, accusee_reception, assignee, resolue, ignoree] }
+        sla_due_at: { type: string, format: date-time }
+        created_at: { type: string, format: date-time }
