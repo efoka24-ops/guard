@@ -43,6 +43,16 @@ Objectif : lever les inconnues techniques identifiées dans le plan avant de fig
 
 **Décision générale** : toute intégration tierce payante ou à validation longue doit être identifiée et lancée administrativement dès la Phase 0/1, en parallèle du développement, pour ne pas devenir un chemin critique en fin de projet.
 
+## 4bis. Version Laravel — abandon de Laravel 10 (EOL / vulnérable) au profit de Laravel 12
+
+**Constat (découvert lors du T001, implémentation)** : à la tentative d'installation, Composer a refusé de résoudre `laravel/framework ^10.10` — **toutes** les versions 10.x sont désormais signalées par des avis de sécurité, Laravel 10 étant en fin de support (EOL) depuis 2025 et ayant reçu depuis des CVE non patchées dans cette branche.
+
+**Décision retenue** (validée avec l'utilisateur) : **basculer sur Laravel 12** (dernière version supportée), sous réserve que l'hébergement Camoo le permette. Laravel 12 requiert **PHP ≥ 8.2** ; l'environnement de dev local dispose de PHP 8.4 (confirmé), donc le développement n'est pas bloqué.
+
+**Point de vérification restant (bloquant avant déploiement prod, pas avant le dev)** : confirmer avec le support Camoo que le forfait `trugro9159` propose bien **PHP 8.2 ou supérieur** via MultiPHP Manager (cPanel). Les versions 8.1 à 8.3 sont couramment proposées par les hébergeurs mutualisés cPanel en 2026, mais cela n'a pas pu être confirmé spécifiquement pour Camoo (recherche web inconclusive, page support Camoo dédiée non accessible — 403). Si seul PHP 8.1 est disponible en prod, il faudra soit négocier une mise à jour du forfait, soit revenir à Laravel 11 (compatible PHP 8.2+ également — donc ce fallback ne résout pas PHP 8.1 non plus) — dans ce cas de figure extrême, seule une VPS/hébergement alternatif permettrait de rester sur une version Laravel supportée. **Action** : à vérifier avant la Phase de déploiement (T052 dans tasks.md), pas avant.
+
+**Mise à jour de la constitution/plan** : `plan.md` (Technical Context, stack) doit être corrigé de "PHP 8.1 (Laravel 10)" vers "PHP 8.2+ (Laravel 12)" — cf. mise à jour appliquée dans le même commit que ce document.
+
 ## 5. Choix du premier module à livrer
 
 **Décision** : confirmer **GUARD ENDPOINT (niveaux 1 et 2 uniquement pour le premier incrément)** comme premier module, conformément à la priorité P1 du cadrage et à sa faible dépendance aux APIs tierces coûteuses/à validation longue (contrairement à SOCIAL et ID). GUARD WEB (P1 également) est un candidat de second incrément rapide car il ne nécessite pas d'agent terminal et peut tourner entièrement côté backend Laravel mutualisé (ping HTTP, hash de page, scan OWASP basique).

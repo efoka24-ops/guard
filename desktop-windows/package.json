@@ -1,0 +1,15 @@
+{
+  "name": "guard-endpoint-windows",
+  "version": "0.1.0",
+  "description": "GUARD ENDPOINT — agent de protection terminaux Windows (niveaux 1-2 : hash SHA-256 + YARA)",
+  "main": "src/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test src/**/*.test.js"
+  },
+  "dependencies": {
+    "electron": "^31.0.0",
+    "usb-detection": "^4.14.0"
+  }
+}

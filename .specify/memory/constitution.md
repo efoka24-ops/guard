@@ -25,7 +25,7 @@ Chaque module (ENDPOINT, SOCIAL, WEB, ID, CODE) doit livrer une valeur autonome 
 
 ## Contraintes Techniques & Conformité
 
-- Stack imposée : PHP 8.1 / Laravel 10 (backend), Kotlin (Android), Electron (Windows), Python/FastAPI (moteur SAST/SCA), TensorFlow Lite INT8 (IA embarquée), MySQL 8, Redis 7, React.js (dashboard), AWS af-south-1.
+- Stack imposée : PHP 8.2+ / Laravel 12 (backend — dernière version supportée ; Laravel 10 écarté le 2026-09-17 pour cause de fin de support et d'avis de sécurité non patchés, cf. research.md §4bis de 001-guard-platform), Kotlin (Android), Electron (Windows), Python/FastAPI (moteur SAST/SCA), TensorFlow Lite INT8 (IA embarquée), MySQL 8, Redis 7, React.js (dashboard), AWS af-south-1.
 - Conformité obligatoire : OWASP Top 10, CVE/NVD, MITRE ATT&CK, ANTIC (Cameroun), RCA (Rwanda), DPPA Rwanda 2021, ARTCI (Côte d'Ivoire), ADIE (Sénégal).
 - Android minimum API 26 (Android 8.0). Compatibilité Windows 7/10/11 pour l'agent Electron.
 - Toute intégration tierce (Meta Graph API, LinkedIn API, X API, HIBP, VirusTotal, AbuseIPDB) doit être encapsulée derrière une couche d'abstraction backend pour permettre substitution sans impact client.
@@ -41,4 +41,5 @@ Chaque module (ENDPOINT, SOCIAL, WEB, ID, CODE) doit livrer une valeur autonome 
 
 Cette constitution prévaut sur toute pratique de développement ponctuelle au sein du dossier `guard/`. Toute modification nécessite : documentation du changement, justification, et mise à jour de la version ci-dessous. Les revues de code et de plan doivent vérifier explicitement la conformité aux principes I à VII.
 
-**Version**: 1.0.0 | **Ratified**: 2026-09-17 | **Last Amended**: 2026-09-17
+**Version**: 1.0.1 | **Ratified**: 2026-09-17 | **Last Amended**: 2026-09-17
+<!-- 1.0.1 : mise à jour de la stack backend (Laravel 10 EOL → Laravel 12), voir Contraintes Techniques & Conformité -->

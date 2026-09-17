@@ -10,7 +10,8 @@ Livrer une suite de cybersécurité à 5 modules indépendants mais interopérab
 
 ## Technical Context
 
-**Language/Version**: Kotlin (Android, min API 26) · Node.js/Electron (Windows 7/10/11) · PHP 8.1 (Laravel 10) · Python 3.11 (FastAPI) · TypeScript/React.js (dashboard)
+**Language/Version**: Kotlin (Android, min API 26) · Node.js/Electron (Windows 7/10/11) · PHP 8.2+ (Laravel 12) · Python 3.11 (FastAPI) · TypeScript/React.js (dashboard)
+<!-- Révisé le 2026-09-17 : Laravel 10 (EOL, versions signalées par avis de sécurité) remplacé par Laravel 12, cf. research.md §4bis -->
 
 **Primary Dependencies**: Laravel 10 + Sanctum (JWT) + Horizon (queues) · Semgrep + Bandit + detect-secrets + truffleHog (moteur SAST/secrets) · TensorFlow Lite (INT8, MobileNetV3-Small) · YARA · Meta Graph API / LinkedIn API / X API v2 (GUARD SOCIAL) · Puppeteer (captures d'écran, PDF) · Recharts + MapLibre GL (dashboard)
 

@@ -19,12 +19,12 @@ Suit `plan.md` : `guard/backend/` (Laravel), `guard/mobile-android/` (Kotlin), `
 
 ## Phase 1: Setup (Infrastructure partagée)
 
-- [ ] T001 Créer le projet Laravel dans `guard/backend/` (`composer create-project laravel/laravel backend "10.*"`)
-- [ ] T002 [P] Configurer `guard/backend/.env` avec `QUEUE_CONNECTION=database`, `CACHE_STORE=database`, `SESSION_DRIVER=database` (cf. research.md §2)
-- [ ] T003 [P] Installer et configurer Sanctum (`php artisan install:api`) pour l'auth JWT (Principe V)
-- [ ] T004 [P] Configurer le linting PHP (Pint) dans `guard/backend/`
-- [ ] T005 [P] Initialiser le squelette agent Android dans `guard/mobile-android/` (Kotlin, min SDK 26)
-- [ ] T006 [P] Initialiser le squelette agent Windows dans `guard/desktop-windows/` (Electron)
+- [x] T001 Créer le projet Laravel dans `guard/backend/` (Laravel 12.69.2, PHP 8.2+ — Laravel 10 abandonné, EOL/vulnérable, cf. research.md §4bis)
+- [x] T002 [P] Configurer `guard/backend/.env` — `QUEUE_CONNECTION=database`, `CACHE_STORE=database`, `SESSION_DRIVER=database` sont déjà les défauts Laravel 12 (aucune modif nécessaire), `APP_NAME=GUARD`, `APP_LOCALE=fr`
+- [x] T003 [P] Installer et configurer Sanctum (`php artisan install:api`) pour l'auth JWT (Principe V) — migration `personal_access_tokens` appliquée
+- [x] T004 [P] Configurer le linting PHP (Pint) dans `guard/backend/` — déjà inclus par `laravel/laravel`, `vendor/bin/pint --test` passe
+- [x] T005 [P] Initialiser le squelette agent Android dans `guard/mobile-android/` (Kotlin, min SDK 26, Gradle + arborescence scanner/quarantine/sync/ui)
+- [x] T006 [P] Initialiser le squelette agent Windows dans `guard/desktop-windows/` (Electron, package.json + main.js)
 
 ---
 

@@ -6,10 +6,10 @@ Ce guide couvre la mise en route locale du **backend Laravel** (API de synchroni
 
 ## 1. Pré-requis locaux
 
-- PHP 8.1+, Composer
-- MySQL 8.0 (ou accès à la base distante `trugro9159_guard` via `pma-12.camoo.net` pour tests contre la vraie base)
+- **PHP 8.2+ et Composer** (révisé : Laravel 10/PHP 8.1 abandonnés le 2026-09-17, cf. research.md §4bis — Laravel 12 requiert PHP ≥ 8.2)
+- SQLite (par défaut, généré automatiquement par `laravel/laravel` — suffisant pour le développement local de ce premier incrément) ou MySQL 8.0 (accès à la base distante `trugro9159_guard` via `pma-12.camoo.net`, réservé aux tests pré-prod, jamais pour le dev quotidien)
 - Node.js LTS (pour le dashboard, phase suivante)
-- Pas besoin de Redis pour ce premier incrément (driver `database`, cf. research.md §2)
+- Pas besoin de Redis pour ce premier incrément (driver `database`, cf. research.md §2 — c'est déjà le défaut de `laravel/laravel` 12.x, aucune configuration manuelle requise)
 
 ## 2. Configuration
 
@@ -27,15 +27,22 @@ CACHE_STORE=database
 SESSION_DRIVER=database
 ```
 
-## 3. Backend Laravel (à créer — `guard/backend/`)
+## 3. Backend Laravel (déjà créé — `guard/backend/`, Laravel 12.69.2)
+
+Réalisé (T001-T004 de tasks.md) :
 
 ```bash
-composer create-project laravel/laravel backend "10.*"
+composer create-project laravel/laravel backend "^12.0"   # PHP 8.2+ requis
 cd backend
+cp .env.example .env && php artisan key:generate
 php artisan install:api        # Sanctum (JWT) — Principe V
-php artisan migrate            # une fois les migrations issues de data-model.md créées
-php artisan queue:table && php artisan migrate   # queue driver database
+php artisan migrate            # tables users/cache/jobs/personal_access_tokens déjà en place
+vendor/bin/pint                # linting — déjà configuré et passant
 ```
+
+`QUEUE_CONNECTION=database`, `CACHE_STORE=database`, `SESSION_DRIVER=database` et `DB_CONNECTION=sqlite` sont déjà les valeurs par défaut de `laravel/laravel` 12.x — aucune modification manuelle n'a été nécessaire (cf. research.md §2).
+
+Reste à faire (T007 et suivants, Phase 2 Foundational) :
 
 Modules à créer selon `plan.md` (`app/Modules/Endpoint/`, `app/Services/CommandCenter/`) : migrations pour `organisations`, `utilisateurs`, `terminaux`, `evenements_scan`, `elements_quarantaine`, `versions_signatures`, `alertes`, `incidents` (cf. data-model.md).
 
