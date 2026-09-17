@@ -73,6 +73,16 @@ return [
             'replace_placeholders' => true,
         ],
 
+        // Canal dédié aux alertes de sécurité générées par les modules GUARD
+        // (Principe VI — traçabilité structurée, distincte des logs applicatifs).
+        'guard_alerts' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/guard-alerts.log'),
+            'level' => 'info',
+            'days' => 90,
+            'replace_placeholders' => true,
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),

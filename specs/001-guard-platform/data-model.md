@@ -36,6 +36,8 @@ Client GUARD (PME, ONG, institution). Racine du cloisonnement multi-tenant (Row 
 ### Utilisateur
 Personne rattachée à une Organisation, avec un profil (cf. section 2 de la SFD : Dirigeant, IT Manager, Développeur, Community Manager, Admin GUARD, Auditeur).
 
+> **Implémentation** : table physique `users` (convention Laravel/Sanctum), pas `utilisateurs` — évite de dupliquer le système d'authentification. Voir `guard/backend/app/Models/User.php`.
+
 | Champ | Type | Règle |
 |---|---|---|
 | id | UUID | PK |

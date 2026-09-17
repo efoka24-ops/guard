@@ -32,16 +32,16 @@ Suit `plan.md` : `guard/backend/` (Laravel), `guard/mobile-android/` (Kotlin), `
 
 **⚠️ CRITIQUE**: Aucune tâche de User Story ne démarre avant la fin de cette phase.
 
-- [ ] T007 Créer la migration `organisations` dans `guard/backend/database/migrations/` (cf. data-model.md §2 Organisation)
-- [ ] T008 Créer la migration `utilisateurs` (rôles dirigeant/it_manager/developpeur/community_manager/admin_guard/auditeur)
-- [ ] T009 Créer la table `jobs`/`failed_jobs` pour la queue driver database (`php artisan queue:table && php artisan migrate`)
-- [ ] T010 [P] Implémenter le modèle `Organisation` dans `guard/backend/app/Models/Organisation.php`
-- [ ] T011 [P] Implémenter le modèle `Utilisateur` dans `guard/backend/app/Models/Utilisateur.php`
-- [ ] T012 Configurer le middleware de cloisonnement multi-tenant (Row Level Security applicative par `organisation_id`) dans `guard/backend/app/Http/Middleware/`
-- [ ] T013 [P] Créer les migrations `alertes` et `incidents` (entités transversales, cf. data-model.md §2)
-- [ ] T014 [P] Implémenter les modèles `Alerte` et `Incident` dans `guard/backend/app/Services/CommandCenter/`
-- [ ] T015 Configurer `php artisan schedule:run` comme point d'entrée cron unique (research.md §1 — pas de worker long-running garanti sur mutualisé)
-- [ ] T016 [P] Configurer la gestion d'erreurs et le logging structuré (Principe VI — alertes compréhensibles)
+- [x] T007 Créer la migration `organisations` dans `guard/backend/database/migrations/` (cf. data-model.md §2 Organisation)
+- [x] T008 Étendre la table `users` (convention Laravel/Sanctum conservée au lieu de `utilisateurs`, cf. note dans le modèle `User`) avec `organisation_id`, `role`, `mfa_active`, `langue`
+- [x] T009 Table `jobs`/`failed_jobs` pour la queue driver database — déjà créée par le scaffold Laravel 12 (T001)
+- [x] T010 [P] Implémenter le modèle `Organisation` dans `guard/backend/app/Models/Organisation.php`
+- [x] T011 [P] Étendre le modèle `User` (`HasApiTokens`, relation `organisation()`) dans `guard/backend/app/Models/User.php`
+- [x] T012 Middleware `ScopeToOrganisation` (alias `scope.organisation`) dans `guard/backend/app/Http/Middleware/ScopeToOrganisation.php`
+- [x] T013 [P] Créer les migrations `alertes` et `incidents` (entités transversales, cf. data-model.md §2)
+- [x] T014 [P] Implémenter les modèles `Alerte` et `Incident` dans `guard/backend/app/Services/CommandCenter/Models/`
+- [x] T015 `Schedule::command('queue:work --stop-when-empty --max-time=50')->everyMinute()` dans `routes/console.php` — point d'entrée cron unique (research.md §1)
+- [x] T016 [P] Canal de log dédié `guard_alerts` (rétention 90j) dans `guard/backend/config/logging.php`
 
 **Checkpoint**: Fondations prêtes — le développement de User Story 1 peut commencer.
 
