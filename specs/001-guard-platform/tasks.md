@@ -55,32 +55,32 @@ Suit `plan.md` : `guard/backend/` (Laravel), `guard/mobile-android/` (Kotlin), `
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T017 [P] [US1] Test de contrat `POST /terminals/register` dans `guard/backend/tests/Feature/Endpoint/RegisterTerminalTest.php`
-- [ ] T018 [P] [US1] Test de contrat `GET /signatures/delta` dans `guard/backend/tests/Feature/Endpoint/SignatureDeltaTest.php`
-- [ ] T019 [P] [US1] Test de contrat `POST /scan-events` (y compris idempotence via `client_event_id`) dans `guard/backend/tests/Feature/Endpoint/ScanEventsTest.php`
-- [ ] T020 [P] [US1] Test de contrat `GET /alerts` + `POST /alerts/{id}/acknowledge` dans `guard/backend/tests/Feature/CommandCenter/AlertsTest.php`
-- [ ] T021 [US1] Test d'intégration bout-en-bout "EICAR offline → quarantaine → sync → alerte critique ≤ SLA 24h" dans `guard/backend/tests/Feature/Endpoint/EndToEndScanTest.php` (dépend de T017-T020)
+- [x] T017 [P] [US1] Test de contrat `POST /terminals/register` dans `guard/backend/tests/Feature/Endpoint/RegisterTerminalTest.php`
+- [x] T018 [P] [US1] Test de contrat `GET /signatures/delta` dans `guard/backend/tests/Feature/Endpoint/SignatureDeltaTest.php`
+- [x] T019 [P] [US1] Test de contrat `POST /scan-events` (y compris idempotence via `client_event_id`) dans `guard/backend/tests/Feature/Endpoint/ScanEventsTest.php`
+- [x] T020 [P] [US1] Test de contrat `GET /alerts` + `POST /alerts/{id}/acknowledge` dans `guard/backend/tests/Feature/CommandCenter/AlertsTest.php`
+- [x] T021 [US1] Test d'intégration bout-en-bout "EICAR offline → quarantaine → sync → alerte critique ≤ SLA 24h" dans `guard/backend/tests/Feature/Endpoint/EndToEndScanTest.php` — 14 tests passent (37 assertions), validé aussi manuellement en HTTP réel avant écriture des tests
 - [ ] T022 [P] [US1] Test unitaire Android : calcul hash SHA-256 + correspondance base locale dans `guard/mobile-android/app/src/test/HashScannerTest.kt`
 - [ ] T023 [P] [US1] Test unitaire Android : correspondance règle YARA sur fichier de test dans `guard/mobile-android/app/src/test/YaraScannerTest.kt`
 
 ### Implementation — Backend (`guard/backend/`)
 
-- [ ] T024 [P] [US1] Migration + modèle `Terminal` dans `guard/backend/database/migrations/` et `app/Modules/Endpoint/Models/Terminal.php` (dépend de T007)
-- [ ] T025 [P] [US1] Migration + modèle `VersionSignatures` dans `app/Modules/Endpoint/Models/VersionSignatures.php`
-- [ ] T026 [US1] Migration + modèle `EvenementScan` dans `app/Modules/Endpoint/Models/EvenementScan.php` (dépend de T024)
-- [ ] T027 [US1] Migration + modèle `ElementQuarantaine` dans `app/Modules/Endpoint/Models/ElementQuarantaine.php` (dépend de T026)
-- [ ] T028 [US1] Implémenter `POST /terminals/register` dans `app/Modules/Endpoint/Http/Controllers/TerminalController.php` (dépend de T024)
-- [ ] T029 [US1] Implémenter `GET /signatures/delta` (calcul du delta depuis `from_version`) dans `app/Modules/Endpoint/Http/Controllers/SignatureController.php` (dépend de T025)
-- [ ] T030 [US1] Implémenter `POST /scan-events` en batch idempotent (clé `client_event_id`) dans `app/Modules/Endpoint/Http/Controllers/ScanEventController.php` (dépend de T026)
-- [ ] T031 [US1] Job asynchrone (queue database) : création d'`Alerte` à partir d'un `EvenementScan` classifié `malware_confirme`/`probable_malware`, avec calcul du `sla_echeance_le` selon criticité dans `app/Modules/Endpoint/Jobs/CreerAlerteDepuisScan.php` (dépend de T030, T014)
-- [ ] T032 [US1] Implémenter `GET /alerts` et `POST /alerts/{id}/acknowledge` dans `app/Services/CommandCenter/Http/Controllers/AlertController.php` (dépend de T014)
-- [ ] T033 [US1] Validation des payloads (hash 64 car., enum trigger/classification/action) et gestion d'erreurs 401/409 dans les controllers Endpoint
+- [x] T024 [P] [US1] Migration + modèle `Terminal` dans `guard/backend/database/migrations/` et `app/Modules/Endpoint/Models/Terminal.php` (dépend de T007)
+- [x] T025 [P] [US1] Migration + modèle `VersionSignatures` dans `app/Modules/Endpoint/Models/VersionSignatures.php`
+- [x] T026 [US1] Migration + modèle `EvenementScan` dans `app/Modules/Endpoint/Models/EvenementScan.php` (dépend de T024)
+- [x] T027 [US1] Migration + modèle `ElementQuarantaine` dans `app/Modules/Endpoint/Models/ElementQuarantaine.php` (dépend de T026)
+- [x] T028 [US1] Implémenter `POST /terminals/register` dans `app/Modules/Endpoint/Http/Controllers/TerminalController.php` — ajout d'un `token_enrolement` sur `Organisation` (absent de data-model.md, gap comblé par migration additive)
+- [x] T029 [US1] Implémenter `GET /signatures/delta` (calcul du delta depuis `from_version`) dans `app/Modules/Endpoint/Http/Controllers/SignatureController.php`
+- [x] T030 [US1] Implémenter `POST /scan-events` en batch idempotent (clé `client_event_id`) dans `app/Modules/Endpoint/Http/Controllers/ScanEventController.php`
+- [x] T031 [US1] Job asynchrone (queue database) : création d'`Alerte` à partir d'un `EvenementScan` classifié `malware_confirme`/`probable_malware`, avec calcul du `sla_echeance_le` selon criticité dans `app/Modules/Endpoint/Jobs/CreerAlerteDepuisScan.php`
+- [x] T032 [US1] Implémenter `GET /alerts` et `POST /alerts/{id}/acknowledge` dans `app/Services/CommandCenter/Http/Controllers/AlertController.php`
+- [x] T033 [US1] Validation des payloads (hash 64 car., enum trigger/classification/action) et gestion d'erreurs 401/409 dans les controllers Endpoint
 
 ### Implementation — Base de signatures de test
 
-- [ ] T034 [P] [US1] Constituer le jeu de hashes de test (EICAR + échantillons bénins) dans `guard/signatures/test/hashes.json`
-- [ ] T035 [P] [US1] Écrire 2-3 règles YARA de test dans `guard/signatures/test/rules/`
-- [ ] T036 [US1] Générer le premier `VersionSignatures` (paquet complet initial) via une commande artisan `php artisan signatures:publish` dans `guard/backend/app/Console/Commands/PublishSignatures.php` (dépend de T025, T034, T035)
+- [x] T034 [P] [US1] Constituer le jeu de hashes de test (EICAR) dans `guard/signatures/test/hashes.json` — hash correct à 64 car. `275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f`
+- [x] T035 [P] [US1] Écrire 2 règles YARA de test dans `guard/signatures/test/rules/`
+- [x] T036 [US1] Commande `php artisan signatures:publish {--dataset=test}` dans `guard/backend/app/Console/Commands/PublishSignatures.php` — validé (paquet initial 1.05 Ko, sous le seuil SC-010)
 
 ### Implementation — Agent Android (`guard/mobile-android/`)
 

@@ -58,13 +58,13 @@ php artisan schedule:work   # simule le cron cPanel en local (schedule:run chaqu
 php artisan serve
 ```
 
-## 4. Base de signatures initiale (SQLite embarquée)
+## 4. Base de signatures initiale (réalisé — T034-T036)
 
 Le premier incrément ne couvre que les niveaux 1 (hash) et 2 (YARA) :
 
-1. Constituer un premier jeu de hashes SHA-256 de test (ex. hash du fichier EICAR standard pour valider la détection sans manipuler de vrai malware).
-2. Écrire 2-3 règles YARA de test simples (détection de chaîne caractéristique) pour valider le pipeline niveau 2.
-3. Générer le premier `VersionSignatures` (paquet complet initial, `from_version` absent dans l'appel `GET /signatures/delta`).
+1. `guard/signatures/test/hashes.json` — hash SHA-256 du fichier EICAR standard : `275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f` (64 caractères — attention à ne pas tronquer une chaîne trouvée en ligne, une version à 63 caractères circule).
+2. `guard/signatures/test/rules/*.yar` — 2 règles YARA de test (chaîne EICAR + marqueur générique).
+3. `php artisan signatures:publish` (`guard/backend/app/Console/Commands/PublishSignatures.php`) publie un `VersionSignatures` à partir de ces fichiers ; ré-exécutable pour publier des deltas incrémentaux.
 
 ## 5. Agent GUARD ENDPOINT (squelette — `guard/mobile-android/` ou `guard/desktop-windows/`)
 

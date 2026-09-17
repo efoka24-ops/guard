@@ -7,6 +7,7 @@ use App\Services\CommandCenter\Models\Incident;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Organisation extends Model
 {
@@ -18,7 +19,15 @@ class Organisation extends Model
         'modules_actifs',
         'score_securite_global',
         'mode_msp',
+        'token_enrolement',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $organisation) {
+            $organisation->token_enrolement ??= Str::random(64);
+        });
+    }
 
     protected function casts(): array
     {

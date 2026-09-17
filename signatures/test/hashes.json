@@ -1,0 +1,10 @@
+{
+  "description": "Jeu de hashes de test pour la validation du niveau 1 (T034). Ne pas utiliser en production — remplacé par la vraie base TRU GROUP (EF-EP-02).",
+  "hashes": [
+    {
+      "sha256": "275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f",
+      "label": "EICAR-STANDARD-ANTIVIRUS-TEST-FILE",
+      "classification": "malware_confirme"
+    }
+  ]
+}
