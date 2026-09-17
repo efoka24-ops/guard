@@ -23,8 +23,13 @@
 
 | Élément | Statut | Remarque |
 |---|---|---|
-| Dépôt Git initialisé | ❌ Non initialisé | Le répertoire de travail `C:\Users\YCXL3291\tru trace` n'est pas un dépôt git ; `check-prerequisites.ps1` et la création de branche par hook (`before_specify`) ne fonctionneront pas tant que `git init` n'a pas été fait. |
+| Dépôt Git initialisé | ✅ Fait | `C:\Users\YCXL3291\guard` (projet déplacé hors de `tru trace`), commit initial `23a83b1`, remote `origin` = `https://github.com/efoka24-ops/guard.git` (non poussé) |
+| Identité git locale | ⚠️ À corriger | Auto-détectée comme `YCXL3291@adcm.orangecm` — exécuter `git config user.name`/`user.email` avant le prochain commit |
+| Push initial vers GitHub | ⬜ En attente de confirmation utilisateur | Le dépôt distant peut déjà contenir du contenu (README, licence…) — vérifier avant `git push -u origin master` pour éviter un conflit ou un écrasement |
 | PowerShell 5.1 disponible | ✅ | Scripts `.specify/scripts/powershell/*.ps1` utilisables |
+| Hébergement production | ✅ Fourni | `guard.trugroup.cm` → `/home/trugro9159/guard` (mutualisé Camoo, FTP `ftp-12.camoo.net`) |
+| Base de données production | ✅ Fournie | MySQL 8.0.46, base `trugro9159_guard`, accès via `https://pma-12.camoo.net` — identifiants stockés localement dans `.env` (non commité) |
+| Secrets DB/FTP | ⚠️ Reçus en clair dans le chat | Stockés uniquement dans `guard/.env` (ignoré par git) ; `.env.example` sert de référence sans valeurs. Recommandé : régénérer les mots de passe une fois la configuration validée, puisqu'ils ont transité en clair dans la conversation. |
 | Backend Laravel 10 / PHP 8.1 | ⬜ À provisionner | Aucun code backend `guard/backend` existant à ce stade |
 | Microservice Python FastAPI (GUARD CODE) | ⬜ À provisionner | Dépendances : Semgrep, Bandit, detect-secrets, truffleHog, pip-audit |
 | Projet Android Kotlin (GUARD ENDPOINT mobile) | ⬜ À provisionner | Min SDK 26, TensorFlow Lite runtime |
