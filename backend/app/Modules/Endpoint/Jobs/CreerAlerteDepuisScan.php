@@ -28,6 +28,19 @@ class CreerAlerteDepuisScan implements ShouldQueue
             return;
         }
 
+        // Corrige M2 (revue backend) : fenêtre de course possible entre la
+        // mise en queue du job et la suppression du terminal (cascade depuis
+        // l'organisation) avant son exécution — sans cette garde, une alerte
+        // pourtant méritée serait silencieusement perdue via une exception
+        // fatale non catchée.
+        if (! $evenement->terminal) {
+            Log::channel('guard_alerts')->warning('Alerte ENDPOINT non créée : terminal introuvable', [
+                'evenement_scan_id' => $evenement->id,
+            ]);
+
+            return;
+        }
+
         $niveauCriticite = $evenement->classification === 'malware_confirme' ? 'critique' : 'eleve';
 
         $alerte = Alerte::create([

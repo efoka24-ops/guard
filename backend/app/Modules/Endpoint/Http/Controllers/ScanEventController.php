@@ -6,15 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Modules\Endpoint\Jobs\CreerAlerteDepuisScan;
 use App\Modules\Endpoint\Models\EvenementScan;
 use App\Modules\Endpoint\Models\Terminal;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 /** T030 — POST /scan-events, batch idempotent (contracts/endpoint-sync-api.yaml). */
 class ScanEventController extends Controller
 {
     public function store(Request $request): JsonResponse
     {
+        /** @var Terminal $terminal authentifié par AuthenticateTerminal (corrige M3, revue backend) */
+        $terminal = $request->attributes->get('terminal');
+
         $data = $request->validate([
             'terminal_id' => ['required', 'uuid', 'exists:terminaux,id'],
             'events' => ['required', 'array', 'min:1'],
@@ -28,17 +31,20 @@ class ScanEventController extends Controller
             'events.*.occurred_at' => ['required', 'date'],
         ]);
 
-        $terminal = Terminal::findOrFail($data['terminal_id']);
+        if ($data['terminal_id'] !== $terminal->id) {
+            abort(403, "Le token d'accès ne correspond pas à terminal_id");
+        }
+
         $idsACreer = [];
+        $doublonsConnus = 0;
 
-        DB::transaction(function () use ($data, $terminal, &$idsACreer) {
-            foreach ($data['events'] as $event) {
-                // Idempotence : un scan-event déjà connu (client_event_id) n'est pas recréé,
-                // permet la resynchronisation sûre après une coupure réseau.
-                if (EvenementScan::where('client_event_id', $event['client_event_id'])->exists()) {
-                    continue;
-                }
-
+        foreach ($data['events'] as $event) {
+            // Idempotence (corrige M1, revue backend) : l'unicité est appliquée
+            // par la contrainte DB `client_event_id` (create_evenements_scan_table),
+            // pas seulement par un exists() préalable — évite la course entre
+            // deux requêtes concurrentes portant le même client_event_id
+            // (scénario réaliste : retry réseau en contexte 2G/offline-first).
+            try {
                 $evenement = EvenementScan::create([
                     'terminal_id' => $terminal->id,
                     'client_event_id' => $event['client_event_id'],
@@ -52,13 +58,26 @@ class ScanEventController extends Controller
                 ]);
 
                 $idsACreer[] = $evenement->id;
-            }
+            } catch (QueryException $e) {
+                if (! str_contains($e->getMessage(), 'client_event_id')) {
+                    throw $e;
+                }
 
-            $terminal->update(['derniere_synchro_le' => now()]);
-        });
+                $doublonsConnus++;
+            }
+        }
+
+        $terminal->update(['derniere_synchro_le' => now()]);
 
         foreach ($idsACreer as $id) {
             CreerAlerteDepuisScan::dispatch($id);
+        }
+
+        // Corrige M4 (revue backend) : 409 si le lot entier était déjà connu,
+        // conforme à endpoint-sync-api.yaml. Un lot partiellement dupliqué
+        // (cas courant en resynchronisation) reste un 202.
+        if (empty($idsACreer) && $doublonsConnus > 0) {
+            return response()->json(['message' => 'Tous les événements étaient déjà reçus'], 409);
         }
 
         return response()->json(status: 202);

@@ -30,16 +30,24 @@ paths:
                 organisation_token: { type: string, description: "Token d'enrôlement fourni à l'organisation" }
       responses:
         "201":
-          description: Terminal créé ou mis à jour
+          description: >
+            Terminal créé ou mis à jour. `access_token` n'est renvoyé qu'ici,
+            en clair, une seule fois (régénéré à chaque appel de register) —
+            le terminal doit le conserver localement et le présenter en
+            Bearer sur /signatures/delta et /scan-events (corrige M3, revue
+            backend : le terminal_id seul n'est pas un secret).
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Terminal" }
         "401": { description: "organisation_token invalide" }
+      x-rate-limit: "20 req/min par IP (corrige C1, revue backend)"
 
   /signatures/delta:
     get:
       summary: Récupérer le delta de signatures depuis une version locale
       operationId: getSignatureDelta
+      security:
+        - terminalToken: []
       parameters:
         - name: from_version
           in: query
@@ -61,6 +69,8 @@ paths:
     post:
       summary: Remonter un ou plusieurs événements de scan (batch, offline-tolerant)
       operationId: submitScanEvents
+      security:
+        - terminalToken: []
       requestBody:
         required: true
         content:
@@ -80,7 +90,10 @@ paths:
             database, cf. research.md §2). Les alertes correspondantes sont
             créées de façon asynchrone, pas dans cette réponse.
         "409":
-          description: "Événements déjà reçus (idempotence par client_event_id)"
+          description: "Tout le lot était déjà reçu (idempotence par client_event_id) ; un lot partiellement dupliqué reste 202"
+        "403":
+          description: "access_token valide mais ne correspondant pas à terminal_id"
+      x-rate-limit: "60 req/min par terminal (corrige C1, revue backend)"
 
   /alerts:
     get:
@@ -121,6 +134,14 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      description: Sanctum — utilisateurs humains du Command Center (/alerts).
+    terminalToken:
+      type: http
+      scheme: bearer
+      description: >
+        access_token opaque délivré par POST /terminals/register (hash
+        SHA-256 stocké côté serveur, jamais le token en clair). Distinct de
+        bearerAuth (Sanctum) : un terminal n'est pas un Utilisateur.
   schemas:
     Terminal:
       type: object
@@ -129,6 +150,7 @@ components:
         platform: { type: string, enum: [android, windows] }
         signature_version: { type: string }
         status: { type: string, enum: [actif, hors_ligne_prolonge, desinstalle] }
+        access_token: { type: string, description: "Renvoyé uniquement par register, à conserver localement" }
 
     SignatureDelta:
       type: object

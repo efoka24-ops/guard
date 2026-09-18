@@ -18,6 +18,7 @@ class Terminal extends Model
         'organisation_id',
         'plateforme',
         'identifiant_appareil',
+        'token_acces_hash',
         'version_app',
         'version_signatures',
         'derniere_synchro_le',

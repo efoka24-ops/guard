@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\CommandCenter\Models\Alerte;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Tests\Feature\Endpoint\Concerns\InteractsWithTerminalAuth;
 use Tests\TestCase;
 
 /**
@@ -16,7 +17,7 @@ use Tests\TestCase;
  */
 class EndToEndScanTest extends TestCase
 {
-    use RefreshDatabase;
+    use InteractsWithTerminalAuth, RefreshDatabase;
 
     private const HASH_EICAR = '275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f';
 
@@ -24,19 +25,17 @@ class EndToEndScanTest extends TestCase
     {
         $organisation = Organisation::create(['nom' => 'ACME', 'pays' => 'CM']);
 
-        // 1. Terminal enregistré (peut avoir eu lieu il y a plusieurs jours, hors ligne).
-        $registerResponse = $this->postJson('/api/v1/terminals/register', [
-            'device_hash' => 'device-eicar-test',
-            'platform' => 'android',
-            'app_version' => '0.1.0',
-            'organisation_token' => $organisation->token_enrolement,
-        ])->assertCreated();
-        $terminalId = $registerResponse->json('id');
+        // 1. Terminal enregistré (peut avoir eu lieu il y a plusieurs jours,
+        //    hors ligne) — l'access_token est conservé localement par l'agent.
+        ['terminal' => $terminal, 'token' => $token] = $this->enregistrerTerminal(
+            $organisation,
+            'device-eicar-test'
+        );
 
         // 2. Le terminal détecte l'EICAR hors ligne (niveau 1 hash), puis se
         //    resynchronise plus tard — occurred_at antérieur à l'envoi.
-        $this->postJson('/api/v1/scan-events', [
-            'terminal_id' => $terminalId,
+        $this->enTantQueTerminal($token)->postJson('/api/v1/scan-events', [
+            'terminal_id' => $terminal->id,
             'events' => [[
                 'client_event_id' => (string) Str::uuid(),
                 'trigger' => 'usb',

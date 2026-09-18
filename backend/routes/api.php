@@ -12,11 +12,20 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::prefix('v1')->group(function () {
-    // Endpoints terminal <-> backend : authentifiés par organisation_token
-    // (device_hash) plutôt que Sanctum — un terminal n'est pas un Utilisateur.
-    Route::post('/terminals/register', [TerminalController::class, 'register']);
-    Route::get('/signatures/delta', [SignatureController::class, 'delta']);
-    Route::post('/scan-events', [ScanEventController::class, 'store']);
+    // POST /terminals/register : authentifié par organisation_token (partagé
+    // par l'organisation, pas par terminal) — throttle pour limiter l'abus
+    // d'énumération (corrige C1, revue backend), sans bloquer un terminal
+    // légitime qui retente après une coupure réseau.
+    Route::post('/terminals/register', [TerminalController::class, 'register'])
+        ->middleware('throttle:20,1');
+
+    // scan-events/signatures/delta : authentifiés par le token d'accès
+    // terminal délivré à l'enrôlement (corrige M3, revue backend) — le
+    // terminal_id seul n'est pas un secret.
+    Route::middleware(['terminal.auth', 'throttle:60,1'])->group(function () {
+        Route::get('/signatures/delta', [SignatureController::class, 'delta']);
+        Route::post('/scan-events', [ScanEventController::class, 'store']);
+    });
 
     // Command Center : réservé aux utilisateurs authentifiés de l'organisation.
     Route::middleware(['auth:sanctum', 'scope.organisation'])->group(function () {

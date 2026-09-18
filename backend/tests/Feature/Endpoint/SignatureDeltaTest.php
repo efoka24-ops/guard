@@ -2,22 +2,37 @@
 
 namespace Tests\Feature\Endpoint;
 
+use App\Models\Organisation;
 use App\Modules\Endpoint\Models\VersionSignatures;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Feature\Endpoint\Concerns\InteractsWithTerminalAuth;
 use Tests\TestCase;
 
 /** T018 — GET /signatures/delta (contracts/endpoint-sync-api.yaml). */
 class SignatureDeltaTest extends TestCase
 {
-    use RefreshDatabase;
+    use InteractsWithTerminalAuth, RefreshDatabase;
+
+    public function test_refuse_lacces_sans_token_terminal(): void
+    {
+        $this->getJson('/api/v1/signatures/delta')->assertUnauthorized();
+    }
 
     public function test_retourne_204_quand_aucune_signature_publiee(): void
     {
-        $this->getJson('/api/v1/signatures/delta')->assertNoContent();
+        $organisation = Organisation::create(['nom' => 'ACME', 'pays' => 'CM']);
+        ['token' => $token] = $this->enregistrerTerminal($organisation);
+
+        $this->enTantQueTerminal($token)
+            ->getJson('/api/v1/signatures/delta')
+            ->assertNoContent();
     }
 
     public function test_retourne_le_paquet_complet_sans_from_version(): void
     {
+        $organisation = Organisation::create(['nom' => 'ACME', 'pays' => 'CM']);
+        ['token' => $token] = $this->enregistrerTerminal($organisation);
+
         VersionSignatures::create([
             'numero_version' => '2026.01.01',
             'taille_delta_ko' => 1,
@@ -27,7 +42,7 @@ class SignatureDeltaTest extends TestCase
             'publie_le' => now()->subDay(),
         ]);
 
-        $response = $this->getJson('/api/v1/signatures/delta');
+        $response = $this->enTantQueTerminal($token)->getJson('/api/v1/signatures/delta');
 
         $response->assertOk()
             ->assertJsonPath('version', '2026.01.01')
@@ -36,6 +51,9 @@ class SignatureDeltaTest extends TestCase
 
     public function test_retourne_uniquement_le_delta_depuis_from_version(): void
     {
+        $organisation = Organisation::create(['nom' => 'ACME', 'pays' => 'CM']);
+        ['token' => $token] = $this->enregistrerTerminal($organisation);
+
         VersionSignatures::create([
             'numero_version' => '2026.01.01',
             'taille_delta_ko' => 1,
@@ -53,7 +71,8 @@ class SignatureDeltaTest extends TestCase
             'publie_le' => now(),
         ]);
 
-        $response = $this->getJson('/api/v1/signatures/delta?from_version=2026.01.01');
+        $response = $this->enTantQueTerminal($token)
+            ->getJson('/api/v1/signatures/delta?from_version=2026.01.01');
 
         $response->assertOk()
             ->assertJsonPath('version', '2026.01.08')
