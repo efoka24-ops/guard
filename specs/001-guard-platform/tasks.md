@@ -60,8 +60,8 @@ Suit `plan.md` : `guard/backend/` (Laravel), `guard/mobile-android/` (Kotlin), `
 - [x] T019 [P] [US1] Test de contrat `POST /scan-events` (y compris idempotence via `client_event_id`) dans `guard/backend/tests/Feature/Endpoint/ScanEventsTest.php`
 - [x] T020 [P] [US1] Test de contrat `GET /alerts` + `POST /alerts/{id}/acknowledge` dans `guard/backend/tests/Feature/CommandCenter/AlertsTest.php`
 - [x] T021 [US1] Test d'intégration bout-en-bout "EICAR offline → quarantaine → sync → alerte critique ≤ SLA 24h" dans `guard/backend/tests/Feature/Endpoint/EndToEndScanTest.php` — 14 tests passent (37 assertions), validé aussi manuellement en HTTP réel avant écriture des tests
-- [ ] T022 [P] [US1] Test unitaire Android : calcul hash SHA-256 + correspondance base locale dans `guard/mobile-android/app/src/test/HashScannerTest.kt`
-- [ ] T023 [P] [US1] Test unitaire Android : correspondance règle YARA sur fichier de test dans `guard/mobile-android/app/src/test/YaraScannerTest.kt`
+- [x] T022 [P] [US1] Test unitaire Android : calcul hash SHA-256 + correspondance base locale dans `guard/mobile-android/app/src/test/kotlin/.../HashScannerTest.kt` — 3/3 tests passent (`./gradlew testDebugUnitTest`)
+- [x] T023 [P] [US1] Test unitaire Android : correspondance règle YARA sur fichier de test dans `guard/mobile-android/app/src/test/kotlin/.../YaraScannerTest.kt` — 3/3 tests passent
 
 ### Implementation — Backend (`guard/backend/`)
 
@@ -84,20 +84,22 @@ Suit `plan.md` : `guard/backend/` (Laravel), `guard/mobile-android/` (Kotlin), `
 
 ### Implementation — Agent Android (`guard/mobile-android/`)
 
-- [ ] T037 [P] [US1] Détecteur de connexion USB / nouvelle installation APK (BroadcastReceiver) dans `app/src/main/kotlin/scanner/DetectionTrigger.kt`
-- [ ] T038 [US1] Scanner niveau 1 (hash SHA-256 + lookup SQLite local) dans `app/src/main/kotlin/scanner/HashScanner.kt` (dépend de T022)
-- [ ] T039 [US1] Scanner niveau 2 (moteur YARA embarqué) dans `app/src/main/kotlin/scanner/YaraScanner.kt` (dépend de T038, T023)
-- [ ] T040 [US1] Gestion de la quarantaine locale (déplacement chiffré AES-256) dans `app/src/main/kotlin/quarantine/QuarantineManager.kt` (dépend de T039)
-- [ ] T041 [US1] File d'envoi différée des `ScanEvent` (Room/SQLite local, UUID `client_event_id`) dans `app/src/main/kotlin/sync/ScanEventQueue.kt` (dépend de T040)
-- [ ] T042 [US1] Client de synchronisation vers `POST /scan-events` et `GET /signatures/delta` dans `app/src/main/kotlin/sync/SyncClient.kt` (dépend de T041, T028-T030)
-- [ ] T043 [US1] Écran de quarantaine (liste, restaurer, supprimer) dans `app/src/main/kotlin/ui/QuarantineScreen.kt` (dépend de T040)
+- [x] T037 [P] [US1] Détecteur de connexion USB (BroadcastReceiver) dans `scanner/DetectionTrigger.kt` — installation d'APK (EF-EP-11) explicitement hors périmètre, cf. commentaire dans le fichier
+- [x] T038 [US1] Scanner niveau 1 (hash SHA-256 + lookup) dans `scanner/HashScanner.kt`
+- [x] T039 [US1] Scanner niveau 2 (moteur YARA simplifié, pas libyara — limitation documentée) dans `scanner/YaraScanner.kt` + `YaraRule.kt`
+- [x] T040 [US1] Quarantaine locale AES-256-GCM dans `quarantine/QuarantineManager.kt`
+- [x] T041 [US1] File d'envoi Room (entités `data/ScanEventEntity.kt`, `data/QuarantineEntity.kt`, `data/GuardDao.kt`, `data/GuardDatabase.kt`) — idempotence via `client_event_id` UUID
+- [x] T042 [US1] Client de synchronisation Retrofit/Moshi dans `sync/SyncClient.kt` + `sync/GuardApi.kt`
+- [x] T043 [US1] Écran de quarantaine (liste, restaurer, supprimer) dans `ui/QuarantineActivity.kt` — Android View/ListView plutôt que Compose (pas de toolchain Compose configuré, évite la complexité de version du compilateur Compose)
+
+**Build validé** : `./gradlew testDebugUnitTest` (6/6 tests) et `./gradlew assembleDebug` passent, après résolution de plusieurs incompatibilités d'environnement local (JDK 26 trop récent pour Kotlin 1.9.24/AGP 8.5.0 → upgrade Kotlin 2.0.21/AGP 8.7.3 ; jlink `androidJdkImage` échouant sous JDK 26 → build pointé sur le JBR d'Android Studio JDK 25 via `org.gradle.java.home`), consignées dans `mobile-android/gradle.properties` et `build.gradle.kts`.
 
 ### Implementation — Agent Windows (`guard/desktop-windows/`)
 
-- [ ] T044 [P] [US1] Détecteur de connexion USB (Electron, écoute des événements système) dans `src/usb-watcher/UsbWatcher.js`
-- [ ] T045 [US1] Scanner niveau 1 + 2 (réutilisation de la logique hash/YARA côté Node.js) dans `src/scanner/FileScanner.js` (dépend de T044)
-- [ ] T046 [US1] Quarantaine locale Windows dans `src/quarantine/QuarantineManager.js` (dépend de T045)
-- [ ] T047 [US1] Synchronisation vers le backend (mêmes endpoints que l'agent Android) dans `src/sync/SyncClient.js` (dépend de T046, T028-T030)
+- [x] T044 [P] [US1] Détecteur USB par polling WMIC (3s) + `chokidar` pour le contenu, dans `src/usb-watcher/UsbWatcher.js` — `usb-detection` (module natif) écarté au profit d'une dépendance pure JS, plus fiable à compiler sur les postes cibles
+- [x] T045 [US1] Scanner niveau 1 + 2 dans `src/scanner/FileScanner.js` (+ `ScanResult.js`, `YaraRule.js`)
+- [x] T046 [US1] Quarantaine locale Windows (AES-256-GCM) dans `src/quarantine/QuarantineManager.js`
+- [x] T047 [US1] Synchronisation vers le backend (mêmes 3 endpoints, access_token Bearer) dans `src/sync/SyncClient.js` — 13/13 tests Node passent (`node --test`)
 
 **Checkpoint**: User Story 1 fonctionnelle et testable indépendamment (parcours quickstart.md §6 validé sur Android ET Windows).
 

@@ -24,10 +24,11 @@
 | Élément | Statut | Remarque |
 |---|---|---|
 | Dépôt Git initialisé | ✅ Fait | `C:\Users\YCXL3291\guard` (projet déplacé hors de `tru trace`), commit initial `23a83b1`, remote `origin` = `https://github.com/efoka24-ops/guard.git` (non poussé) |
-| Identité git locale | ⚠️ À corriger | Auto-détectée comme `YCXL3291@adcm.orangecm` — exécuter `git config user.name`/`user.email` avant le prochain commit |
+| Identité git locale | ✅ Corrigée | `ZIEGOUBE FOKA Emmanuel <emm.foka@gmail.com>` depuis le commit `11f023e` |
+| DNS sous-domaine `guard.trugroup.cm` | ✅ Confirmé par le support Camoo | Correctement configuré au niveau DNS. Erreur "Not Found" actuelle attendue : aucun fichier n'a encore été déployé dans le répertoire `guard` (déploiement backend prévu après validation du premier incrément en local, cf. T052) |
 | Push initial vers GitHub | ⬜ En attente de confirmation utilisateur | Le dépôt distant peut déjà contenir du contenu (README, licence…) — vérifier avant `git push -u origin master` pour éviter un conflit ou un écrasement |
 | PowerShell 5.1 disponible | ✅ | Scripts `.specify/scripts/powershell/*.ps1` utilisables |
-| Hébergement production | ✅ Fourni | `guard.trugroup.cm` → `/home/trugro9159/guard` (mutualisé Camoo, FTP `ftp-12.camoo.net`) |
+| Hébergement production | ✅ Fourni | Sous-domaine `guard.trugroup.cm`, de type "chemin dans l'espace web actuel" du domaine `trugroup.cm` (pas un compte d'hébergement séparé) → répertoire `guard` → `/home/trugro9159/guard` (mutualisé Camoo, FTP `ftp-12.camoo.net`). Implication : `guard.trugroup.cm` partage le même espace disque/quota et la même configuration PHP (MultiPHP) que le domaine principal `trugroup.cm` — à vérifier lors du déploiement que cela n'entre pas en conflit avec une éventuelle version PHP différente utilisée par le site principal. |
 | Base de données production | ✅ Fournie | MySQL 8.0.46, base `trugro9159_guard`, accès via `https://pma-12.camoo.net` — identifiants stockés localement dans `.env` (non commité) |
 | Secrets DB/FTP | ⚠️ Reçus en clair dans le chat | Stockés uniquement dans `guard/.env` (ignoré par git) ; `.env.example` sert de référence sans valeurs. Recommandé : régénérer les mots de passe une fois la configuration validée, puisqu'ils ont transité en clair dans la conversation. |
 | Backend Laravel 10 / PHP 8.1 | ⬜ À provisionner | Aucun code backend `guard/backend` existant à ce stade |

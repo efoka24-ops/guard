@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">GUARD</string>
+    <string name="quarantaine_titre">Quarantaine</string>
+    <string name="quarantaine_vide">Aucun élément en quarantaine</string>
+    <string name="action_restaurer">Restaurer</string>
+    <string name="action_supprimer">Supprimer</string>
+</resources>

@@ -3,7 +3,7 @@ package africa.trugroup.guard.scanner
 /**
  * Représentation minimale d'une règle YARA : un nom et un ensemble de
  * chaînes littérales (`strings:`). La condition supportée est "au moins une
- * chaîne présente" — suffisant pour guard/signatures/test/rules/*.yar
+ * chaîne présente" — suffisant pour les fichiers .yar de guard/signatures/test/rules
  * (T035), mais PAS un moteur YARA complet (pas de regex, pas d'opérateurs
  * booléens combinés, pas de hex strings). Un vrai moteur YARA embarqué
  * (libyara via JNI) est hors périmètre de ce premier incrément.
@@ -14,7 +14,9 @@ data class YaraRule(val nom: String, val chaines: List<String>) {
 
     companion object {
         private val REGLE_REGEX = Regex("""rule\s+(\w+)\s*\{([\s\S]*?)\n\}""")
-        private val CHAINE_REGEX = Regex(""""((?:[^"\\]|\\.)*)"""")
+        // Concaténation pour éviter l'ambiguïté """..."" en fin de raw string Kotlin
+        // (un guillemet littéral juste avant le délimiteur fermant """ le prolonge).
+        private val CHAINE_REGEX = Regex("\"" + """((?:[^"\\]|\\.)*)""" + "\"")
 
         /** Parse un fichier .yar au format restreint décrit ci-dessus. */
         fun parserFichier(texteYar: String): List<YaraRule> =
