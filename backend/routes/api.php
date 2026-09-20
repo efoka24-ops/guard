@@ -4,6 +4,7 @@ use App\Modules\Endpoint\Http\Controllers\ScanEventController;
 use App\Modules\Endpoint\Http\Controllers\SignatureController;
 use App\Modules\Endpoint\Http\Controllers\TerminalController;
 use App\Services\CommandCenter\Http\Controllers\AlertController;
+use App\Services\CommandCenter\Http\Controllers\ScoreController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,5 +32,6 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum', 'scope.organisation'])->group(function () {
         Route::get('/alerts', [AlertController::class, 'index']);
         Route::post('/alerts/{id}/acknowledge', [AlertController::class, 'acknowledge']);
+        Route::get('/organisations/{id}/score', [ScoreController::class, 'show']);
     });
 });

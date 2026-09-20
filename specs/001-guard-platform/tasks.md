@@ -109,8 +109,8 @@ Suit `plan.md` : `guard/backend/` (Laravel), `guard/mobile-android/` (Kotlin), `
 
 **Purpose**: Rendre visibles les alertes générées par US1 sans attendre le dashboard complet.
 
-- [ ] T048 [P] Endpoint `GET /organisations/{id}/score` (calcul simple : 100 − pondération alertes actives par criticité) dans `guard/backend/app/Services/CommandCenter/Http/Controllers/ScoreController.php` (dépend de T014)
-- [ ] T049 [P] Vue minimale (CLI ou route JSON brute) listant les alertes actives pour validation manuelle avant dashboard React (dépend de T032)
+- [x] T048 [P] Endpoint `GET /organisations/{id}/score` (100 − pondération par criticité : critique=25, élevé=10, moyen=5, faible=2 ; scope à l'organisation de l'utilisateur, comme `/alerts`) — 4/4 tests
+- [x] T049 [P] Commande CLI `php artisan alertes:lister {organisation_id?}` (tableau trié par criticité puis SLA, avec repère `[DÉPASSÉ]`) — validée manuellement
 
 ---
 
