@@ -19,7 +19,7 @@ Suit `plan.md` : `guard/backend/` (Laravel), `guard/mobile-android/` (Kotlin), `
 
 ## Phase 1: Setup (Infrastructure partagée)
 
-- [x] T001 Créer le projet Laravel dans `guard/backend/` (Laravel 12.69.2, PHP 8.2+ — Laravel 10 abandonné, EOL/vulnérable, cf. research.md §4bis)
+- [x] T001 Créer le projet Laravel dans `guard/backend/` (Laravel 12 d abord, puis **Laravel 10.50.3 / PHP 8.1** depuis le 2026-09-26 car le serveur Camoo reste en PHP 8.1 — risque assumé, cf. research.md §4ter)
 - [x] T002 [P] Configurer `guard/backend/.env` — `QUEUE_CONNECTION=database`, `CACHE_STORE=database`, `SESSION_DRIVER=database` sont déjà les défauts Laravel 12 (aucune modif nécessaire), `APP_NAME=GUARD`, `APP_LOCALE=fr`
 - [x] T003 [P] Installer et configurer Sanctum (`php artisan install:api`) pour l'auth JWT (Principe V) — migration `personal_access_tokens` appliquée
 - [x] T004 [P] Configurer le linting PHP (Pint) dans `guard/backend/` — déjà inclus par `laravel/laravel`, `vendor/bin/pint --test` passe
@@ -34,13 +34,13 @@ Suit `plan.md` : `guard/backend/` (Laravel), `guard/mobile-android/` (Kotlin), `
 
 - [x] T007 Créer la migration `organisations` dans `guard/backend/database/migrations/` (cf. data-model.md §2 Organisation)
 - [x] T008 Étendre la table `users` (convention Laravel/Sanctum conservée au lieu de `utilisateurs`, cf. note dans le modèle `User`) avec `organisation_id`, `role`, `mfa_active`, `langue`
-- [x] T009 Table `jobs`/`failed_jobs` pour la queue driver database — déjà créée par le scaffold Laravel 12 (T001)
+- [x] T009 Table `jobs`/`failed_jobs` pour la queue driver database — migrations sessions/cache/jobs générées (`session:table`, `cache:table`, `queue:table`) car absentes du squelette Laravel 10
 - [x] T010 [P] Implémenter le modèle `Organisation` dans `guard/backend/app/Models/Organisation.php`
 - [x] T011 [P] Étendre le modèle `User` (`HasApiTokens`, relation `organisation()`) dans `guard/backend/app/Models/User.php`
 - [x] T012 Middleware `ScopeToOrganisation` (alias `scope.organisation`) dans `guard/backend/app/Http/Middleware/ScopeToOrganisation.php`
 - [x] T013 [P] Créer les migrations `alertes` et `incidents` (entités transversales, cf. data-model.md §2)
 - [x] T014 [P] Implémenter les modèles `Alerte` et `Incident` dans `guard/backend/app/Services/CommandCenter/Models/`
-- [x] T015 `Schedule::command('queue:work --stop-when-empty --max-time=50')->everyMinute()` dans `routes/console.php` — point d'entrée cron unique (research.md §1)
+- [x] T015 `Schedule::command('queue:work --stop-when-empty --max-time=50')->everyMinute()` dans `app/Console/Kernel.php` (Laravel 10) — point d entrée cron unique (research.md §1)
 - [x] T016 [P] Canal de log dédié `guard_alerts` (rétention 90j) dans `guard/backend/config/logging.php`
 
 **Checkpoint**: Fondations prêtes — le développement de User Story 1 peut commencer.
