@@ -123,7 +123,7 @@ Suit `plan.md` : `guard/backend/` (Laravel), `guard/mobile-android/` (Kotlin), `
 
 ## Phase 6: Polish & Déploiement
 
-- [ ] T052 [P] Documenter le déploiement sur l'hébergement Camoo dans `guard/specs/001-guard-platform/deployment.md` (après confirmation support Camoo — cf. research.md §1)
+- [x] T052 Déploiement sur Camoo (FTP seul) réalisé et documenté dans `specs/001-guard-platform/deployment.md` — backend Laravel 10/PHP 8.1 en ligne (HTTP), parcours EICAR validé en production
 - [ ] T053 [P] Durcissement sécurité : audit des permissions Android déclarées, revue OWASP des endpoints Endpoint/CommandCenter
 - [ ] T054 Exécuter la validation complète de `quickstart.md` de bout en bout (Android + Windows + backend)
 - [ ] T055 [P] Mesurer consommation RAM/CPU de l'agent Android en conditions réelles et comparer aux budgets SC-009 (< 80 Mo RAM, < 5 % CPU)

@@ -31,6 +31,7 @@ class Organisation extends Model
     {
         static::creating(function (self $organisation) {
             $organisation->token_enrolement ??= Str::random(64);
+            $organisation->modules_actifs ??= [];
         });
     }
 

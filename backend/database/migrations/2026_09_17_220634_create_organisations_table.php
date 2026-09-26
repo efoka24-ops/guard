@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('nom');
             $table->string('pays', 2); // CM, RW, SN, CI, ... — cf. data-model.md
-            $table->json('modules_actifs')->default('[]');
+            $table->json('modules_actifs')->nullable(); // MySQL interdit un défaut littéral sur JSON ; [] posé par le modèle
             $table->unsignedTinyInteger('score_securite_global')->default(100);
             $table->boolean('mode_msp')->default(false);
             $table->timestamps();
