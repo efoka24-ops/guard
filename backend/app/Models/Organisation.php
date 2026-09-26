@@ -22,19 +22,16 @@ class Organisation extends Model
         'token_enrolement',
     ];
 
+    protected $casts = [
+        'modules_actifs' => 'array',
+        'mode_msp' => 'boolean',
+    ];
+
     protected static function booted(): void
     {
         static::creating(function (self $organisation) {
             $organisation->token_enrolement ??= Str::random(64);
         });
-    }
-
-    protected function casts(): array
-    {
-        return [
-            'modules_actifs' => 'array',
-            'mode_msp' => 'boolean',
-        ];
     }
 
     public function utilisateurs(): HasMany

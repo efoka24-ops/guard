@@ -26,12 +26,9 @@ class Terminal extends Model
         'statut',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'derniere_synchro_le' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'derniere_synchro_le' => 'datetime',
+    ];
 
     public function organisation(): BelongsTo
     {

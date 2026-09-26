@@ -27,13 +27,10 @@ class EvenementScan extends Model
         'synchronise_le',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'survenu_le' => 'datetime',
-            'synchronise_le' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'survenu_le' => 'datetime',
+        'synchronise_le' => 'datetime',
+    ];
 
     /** Classifications qui doivent déclencher la création d'une Alerte (cf. CreerAlerteDepuisScan). */
     public function estAlertant(): bool

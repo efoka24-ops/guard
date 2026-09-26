@@ -21,12 +21,9 @@ class ElementQuarantaine extends Model
         'resolu_le',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'resolu_le' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'resolu_le' => 'datetime',
+    ];
 
     public function evenementScan(): BelongsTo
     {

@@ -27,12 +27,9 @@ class Alerte extends Model
         'assignee_utilisateur_id',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'sla_echeance_le' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'sla_echeance_le' => 'datetime',
+    ];
 
     /** Calcule l'échéance SLA selon le niveau de criticité (FR-024). */
     public static function slaPour(string $niveauCriticite): \DateTimeInterface

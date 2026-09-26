@@ -53,6 +53,14 @@ Objectif : lever les inconnues techniques identifiées dans le plan avant de fig
 
 **Mise à jour de la constitution/plan** : `plan.md` (Technical Context, stack) doit être corrigé de "PHP 8.1 (Laravel 10)" vers "PHP 8.2+ (Laravel 12)" — cf. mise à jour appliquée dans le même commit que ce document.
 
+## 4ter. Révision (2026-09-26) : retour à Laravel 10 / PHP 8.1 pour déployer sur Camoo — risque assumé
+
+**Constat** : le serveur Camoo de `guard.trugroup.cm` reste en **PHP 8.1.34** (pas de changement possible pour l'instant) ; Laravel 11/12 exigent PHP ≥ 8.2. Le SSL est aussi différé (budget).
+
+**Décision de l'utilisateur** (choix explicite parmi : différer / rétrograder / héberger ailleurs) : **rétrograder le backend en Laravel 10** pour déployer maintenant.
+
+**Risque accepté, à ne pas perdre de vue** : Laravel 10 est en fin de support, Composer signale des avis de sécurité non corrigés sur toute la branche 10.x (installation avec `--no-security-blocking`), et PHP 8.1 est lui-même EOL. Pour un produit de cybersécurité c'est une dette de sécurité explicite (Principe V de la constitution) : **à résorber dès qu'un hébergement PHP ≥ 8.2 est disponible** (retour à Laravel 12, l'historique git conserve la version 12 validée, 21 tests). Compensations : API sans HTML/sessions côté utilisateur final, `guard-app/` verrouillé par `.htaccess`, throttle sur les routes publiques, pas d'upload de fichiers, pas de HTTPS tant que le SSL n'est pas acheté (donc **aucune donnée réelle sensible ne doit transiter avant HTTPS** : tokens terminaux et Bearer Sanctum circuleraient en clair).
+
 ## 5. Choix du premier module à livrer
 
 **Décision** : confirmer **GUARD ENDPOINT (niveaux 1 et 2 uniquement pour le premier incrément)** comme premier module, conformément à la priorité P1 du cadrage et à sa faible dépendance aux APIs tierces coûteuses/à validation longue (contrairement à SOCIAL et ID). GUARD WEB (P1 également) est un candidat de second incrément rapide car il ne nécessite pas d'agent terminal et peut tourner entièrement côté backend Laravel mutualisé (ping HTTP, hash de page, scan OWASP basique).

@@ -24,14 +24,11 @@ class Incident extends Model
         'cloture_le',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'dossier_legal_genere' => 'boolean',
-            'ouvert_le' => 'datetime',
-            'cloture_le' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'dossier_legal_genere' => 'boolean',
+        'ouvert_le' => 'datetime',
+        'cloture_le' => 'datetime',
+    ];
 
     public function organisation(): BelongsTo
     {

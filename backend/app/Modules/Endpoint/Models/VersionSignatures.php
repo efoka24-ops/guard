@@ -21,14 +21,11 @@ class VersionSignatures extends Model
         'publie_le',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'hashes_ajoutes' => 'array',
-            'regles_yara_ajoutees' => 'array',
-            'publie_le' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'hashes_ajoutes' => 'array',
+        'regles_yara_ajoutees' => 'array',
+        'publie_le' => 'datetime',
+    ];
 
     /** Dernière version publiée (utile pour le paquet complet initial, sans from_version). */
     public static function derniere(): ?self

@@ -14,3 +14,8 @@
 *.log
 .DS_Store
 Thumbs.db
+
+# Artefacts de déploiement FTP (contiennent vendor/ complet et un .env de production)
+/deploy-stage/
+/deploy-stage.zip
+/deploy-secrets/
