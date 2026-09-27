@@ -18,7 +18,11 @@ const DOSSIER_DONNEES = app.getPath('userData');
 const DOSSIER_SIGNATURES = path.join(__dirname, '..', '..', 'signatures', 'test'); // guard/signatures/test
 const CHEMIN_ETAT_SYNC = path.join(DOSSIER_DONNEES, 'guard-etat.json');
 const DOSSIER_QUARANTAINE = path.join(DOSSIER_DONNEES, 'quarantaine');
-const BASE_URL_BACKEND = process.env.GUARD_BACKEND_URL || 'https://guard.trugroup.cm/api/v1';
+// HTTP (pas HTTPS) tant que le SSL n'est pas activé sur guard.trugroup.cm
+// (hébergement Camoo, cf. specs/001-guard-platform/deployment.md — reste à
+// faire). Les tokens circulent donc en clair : GUARD_BACKEND_URL permet de
+// pointer ailleurs (ex. un tunnel HTTPS) sans changer le code.
+const BASE_URL_BACKEND = process.env.GUARD_BACKEND_URL || 'http://guard.trugroup.cm/api/v1';
 
 /**
  * TODO production : dériver cette clé depuis Windows DPAPI
