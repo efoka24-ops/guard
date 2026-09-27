@@ -92,7 +92,7 @@
     <header>
         <div class="inner">
             <a href="/" class="brand">
-                <img src="/guard-logo.png" alt="GUARD">
+                <img src="/guard-icon.png" alt="GUARD">
                 <strong>GUARD</strong>
                 <span>by TRU GROUP</span>
             </a>
