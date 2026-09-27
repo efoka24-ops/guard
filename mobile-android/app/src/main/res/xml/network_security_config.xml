@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Autorise le trafic HTTP en clair, mais uniquement vers guard.trugroup.cm
+    (l'hébergement Camoo n'a pas encore de SSL, cf. deployment.md). Toute
+    autre destination reste soumise à la politique par défaut d'Android
+    (HTTPS obligatoire depuis l'API 28) : cette exception ne s'étend pas
+    globalement à l'application.
+-->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">guard.trugroup.cm</domain>
+    </domain-config>
+</network-security-config>
