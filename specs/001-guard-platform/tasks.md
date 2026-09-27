@@ -125,8 +125,8 @@ Suit `plan.md` : `guard/backend/` (Laravel), `guard/mobile-android/` (Kotlin), `
 
 - [x] T052 Déploiement sur Camoo (FTP seul) réalisé et documenté dans `specs/001-guard-platform/deployment.md` — backend Laravel 10/PHP 8.1 en ligne (HTTP), parcours EICAR validé en production
 - [x] T053 [P] Durcissement sécurité : audit des permissions Android déclarées, revue OWASP des endpoints Endpoint/CommandCenter — faille de détournement de terminal inter-organisations corrigée et déployée en production, permission Android inutilisée retirée, filtre d'intent mort remplacé
-- [ ] T054 Exécuter la validation complète de `quickstart.md` de bout en bout (Android + Windows + backend)
-- [ ] T055 [P] Mesurer consommation RAM/CPU de l'agent Android en conditions réelles et comparer aux budgets SC-009 (< 80 Mo RAM, < 5 % CPU)
+- [~] T054 Validation `quickstart.md` §6 de bout en bout : **backend + agent Windows validés en local avec le code réel de production** (SyncClient.enregistrer/enfilerEvenement/synchroniserEvenements, y compris simulation hors-ligne/reconnexion), alerte critique créée avec SLA 24h conforme. Volet Android et volet « vrai support USB physique » non faits ici — nécessitent un appareil Android et une clé USB réelle, hors de portée de cet environnement (pas d'ADB/émulateur disponible)
+- [ ] T055 [P] Mesurer consommation RAM/CPU de l'agent Android en conditions réelles et comparer aux budgets SC-009 (< 80 Mo RAM, < 5 % CPU) — nécessite un appareil Android physique ou un émulateur avec Android Studio Profiler ; aucun appareil/émulateur disponible dans cet environnement, à faire par l'utilisateur
 
 ---
 
