@@ -10,7 +10,7 @@
         :root { color-scheme: dark; }
         body {
             margin: 0; min-height: 100vh; display: grid; place-items: center;
-            background: #03061a; color: #e6ecff;
+            background: #000413; color: #e6ecff;
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
             text-align: center; padding: 24px;
         }
