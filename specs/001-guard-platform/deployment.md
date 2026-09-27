@@ -39,10 +39,17 @@
 | MySQL 1101 sur `modules_actifs` | défaut littéral interdit sur colonne JSON | colonne `nullable`, `[]` posé par le modèle |
 | curl (26) sur `/tmp/...` | curl Windows ne résout pas les chemins MSYS | fichiers sous `C:\…` |
 
+## Agents branchés sur la production (2026-09-27)
+
+Windows et Android ciblent désormais `http://guard.trugroup.cm/api/v1` par défaut (HTTPS pas encore actif) :
+- **Windows** (`desktop-windows/src/main.js`) : `GUARD_BACKEND_URL` (variable d'environnement) surcharge la valeur par défaut sans toucher au code. Testé en direct contre la production (enregistrement de terminal réussi).
+- **Android** (`mobile-android/.../RetrofitFactory.kt`) : cible HTTP par défaut. Le trafic en clair n'est autorisé que vers `guard.trugroup.cm` via `res/xml/network_security_config.xml` référencé dans `AndroidManifest.xml` — pas d'exception globale, le reste de l'app reste soumis à HTTPS obligatoire.
+
+**Dès que le SSL sera actif** : repasser les deux valeurs par défaut en `https://`, retirer `network_security_config.xml` (ou son entrée pour ce domaine), régénérer `GUARD_BACKEND_URL` si utilisé en déploiement.
+
 ## Reste à faire
 
 - Cron cPanel `* * * * * php /home/trugro9159/guard/guard-app/artisan schedule:run` si on repasse la queue en `database`.
-- HTTPS (AutoSSL) dès que possible, puis `APP_URL=https://…` et cookies `secure`.
-- Agents : cible `https://guard.trugroup.cm/api/v1` par défaut ; en attendant HTTPS, `GUARD_BACKEND_URL=http://…` (Windows) ; Android bloque le clair par défaut (network security config à décider).
+- HTTPS (AutoSSL) dès que possible, puis `APP_URL=https://…`, cookies `secure`, et retour des agents en HTTPS (ci-dessus).
 - Changer les mots de passe MySQL et FTP (transmis en clair par FTP et collés dans le chat).
 - Retour à Laravel 12 dès qu'un hébergement PHP ≥ 8.2 est disponible.
