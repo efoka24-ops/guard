@@ -6,7 +6,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:name=".GuardApplication"
@@ -34,8 +33,16 @@
                 <action android:name="android.intent.action.MEDIA_MOUNTED" />
                 <data android:scheme="file" />
             </intent-filter>
+            <!--
+                Durcissement (T053) : android.intent.action.PACKAGE_INSTALL n'est
+                pas un broadcast système diffusé par Android — ce filtre était
+                mort et n'a jamais déclenché l'interception d'installation
+                d'APK (EF-EP-11). La détection réelle d'installation utilise
+                android.intent.action.PACKAGE_ADDED avec le scheme "package".
+            -->
             <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_INSTALL" />
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <data android:scheme="package" />
             </intent-filter>
         </receiver>
 
