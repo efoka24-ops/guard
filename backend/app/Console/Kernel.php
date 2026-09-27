@@ -17,6 +17,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('queue:work --stop-when-empty --max-time=50')
             ->everyMinute()
             ->withoutOverlapping();
+
+        // GUARD WEB (module #2) — cf. guard-web-plan.md §4.
+        $schedule->command('web:verifier defacements')->everyTwoMinutes()->withoutOverlapping();
+        $schedule->command('web:verifier en-tetes')->weekly()->withoutOverlapping();
+        $schedule->command('web:verifier ssl')->daily()->withoutOverlapping();
     }
 
     /**
