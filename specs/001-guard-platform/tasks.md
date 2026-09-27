@@ -116,7 +116,7 @@ Suit `plan.md` : `guard/backend/` (Laravel), `guard/mobile-android/` (Kotlin), `
 
 ## Phase 5: Prochain incrément (aperçu, non détaillé ici)
 
-- [ ] T050 Rédiger le cadrage Phase 1 dédié à **GUARD WEB** (User Story 2 du spec.md) une fois US1 validée en conditions réelles (cf. research.md §5 — module #2 recommandé)
+- [x] T050 Cadrage GUARD WEB rédigé dans `specs/001-guard-platform/guard-web-cadrage.md` (perimetre restreint au passif : defacement, en-tetes, SSL — injection active hors perimetre, cf. Principe V)
 - [ ] T051 Rédiger le cadrage Phase 1 dédié au **niveau 3 GUARD ENDPOINT** (IA TFLite) une fois le corpus d'entraînement constitué (cf. research.md §3)
 
 ---
